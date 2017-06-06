@@ -9,7 +9,7 @@ import org.springframework.mail.SimpleMailMessage;
  */
 public abstract class AbstractEmailService implements EmailService {
 
-    @Value("${default.to.address}")
+    @Value("${default.to.address}")//spring sets the value from the application.properties value to the string variable
     private String defaultToAddress;
     /**
      * Creates a Simple Mail Message from feedback pojo
