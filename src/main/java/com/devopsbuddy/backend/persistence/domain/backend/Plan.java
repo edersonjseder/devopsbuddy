@@ -1,10 +1,13 @@
 package com.devopsbuddy.backend.persistence.domain.backend;
 
+import com.devopsbuddy.enums.PlansEnum;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
+ * Entity model to represent the stripe plan.
  * Created by root on 07/06/17.
  */
 @Entity
@@ -19,6 +22,11 @@ public class Plan implements Serializable {
     /** Default constructor */
     public Plan(){
 
+    }
+
+    public Plan(PlansEnum plansEnum){
+        this.id = plansEnum.getId();
+        this.name = plansEnum.getPlanName();
     }
 
     public int getId() {
