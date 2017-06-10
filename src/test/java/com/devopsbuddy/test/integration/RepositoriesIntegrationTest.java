@@ -10,7 +10,7 @@ import com.devopsbuddy.backend.persistence.repositories.RoleRepository;
 import com.devopsbuddy.backend.persistence.repositories.UserRepository;
 import com.devopsbuddy.enums.PlansEnum;
 import com.devopsbuddy.enums.RolesEnum;
-import com.devopsbuddy.utils.UsersUtils;
+import com.devopsbuddy.utils.UserUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,38 +64,15 @@ public class RepositoriesIntegrationTest {
     }
 
     @Test
+    public void testDeleteUser() throws Exception {
+        User basicUser = createUser();
+        userRepository.delete(basicUser.getId());
+    }
+
+    @Test
     public void testCreateNewUser() throws Exception {
-        /** Creates a plan first */
-        Plan basicPlan = createBasicPlan(PlansEnum.BASIC);
-        planRepository.save(basicPlan);
 
-        /** Creates the user and add the plan object as a foreign key */
-        User basicUser = UsersUtils.createBasicUser();
-        basicUser.setPlan(basicPlan);
-
-        /** Creates a role */
-        Role basicRole = createBasicRole(RolesEnum.BASIC);
-        /** Creates a Set collection of roles due to the
-         * one to many relationship between entities */
-        Set<UserRole> userRoles = new HashSet<>();
-        /** Creates the object that represent the one to many
-         * relationship between user and role entities and add
-         * both objects on entity as foreign key */
-        UserRole userRole = new UserRole(basicUser, basicRole);
-
-        userRoles.add(userRole);
-
-        /** Adding the object collection of user roles to user entity
-         * (Always call the get method of Set collection to add objects in JPA)*/
-        basicUser.getUserRoles().addAll(userRoles);
-
-        /** Saves the other side of the user to roles
-         * relationship by persisting all roles in
-         * the UserRoles collection */
-        for (UserRole ur : userRoles) {
-
-            roleRepository.save(ur.getRole());
-        }
+        User basicUser = createUser();
 
         /** Now that all relationship entities have been
          * saved, it saves the user entity */
@@ -116,6 +93,38 @@ public class RepositoriesIntegrationTest {
             Assert.assertNotNull(ur.getRole().getId());
         }
 
+    }
+
+    private User createUser() {
+
+        /** Creates a plan first */
+        Plan basicPlan = createBasicPlan(PlansEnum.BASIC);
+        planRepository.save(basicPlan);
+
+        /** Creates the user and add the plan object as a foreign key */
+        User basicUser = UserUtils.createBasicUser();
+        basicUser.setPlan(basicPlan);
+
+        /** Creates a role */
+        Role basicRole = createBasicRole(RolesEnum.BASIC);
+        roleRepository.save(basicRole);
+
+        /** Creates a Set collection of roles due to the
+         * one to many relationship between entities */
+        Set<UserRole> userRoles = new HashSet<>();
+
+        /** Creates the object that represent the one to many
+         * relationship between user and role entities and add
+         * both objects on entity as foreign key */
+        UserRole userRole = new UserRole(basicUser, basicRole);
+        userRoles.add(userRole);
+
+        /** Adding the object collection of user roles to user entity
+         * (Always call the get method of Set collection to add objects in JPA)*/
+        basicUser.getUserRoles().addAll(userRoles);
+        basicUser = userRepository.save(basicUser);
+
+        return basicUser;
     }
 
     private Plan createBasicPlan(PlansEnum plansEnum) {
