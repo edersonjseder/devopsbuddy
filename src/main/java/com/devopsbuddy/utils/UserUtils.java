@@ -16,13 +16,16 @@ public class UserUtils {
 
     /**
      * Creates a user with basic attributes set.
-     * @return
+     *
+     * @param username The username parameter.
+     * @param email The email parameter.
+     * @return The User object.
      */
-    public static User createBasicUser() {
+    public static User createBasicUser(String username, String email) {
         User user = new User();
-        user.setUsername("basicUser");
+        user.setUsername(username);
         user.setPassword("secret");
-        user.setEmail("me@example.com");
+        user.setEmail(email);
         user.setFirstName("firstName");
         user.setLastName("lastName");
         user.setPhoneNumber("123456789");
