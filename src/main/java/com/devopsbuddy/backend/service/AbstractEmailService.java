@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 
 /**
+ * This class is the implementation of the email sending
+ * it gets the user information from the front-end form
+ * and stores in the Feedback object to be sent by e-mail.
  * Created by root on 04/06/17.
  */
 public abstract class AbstractEmailService implements EmailService {

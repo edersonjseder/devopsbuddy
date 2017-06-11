@@ -2,6 +2,7 @@ package com.devopsbuddy.config;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -13,5 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(basePackages = "com.devopsbuddy.backend.persistence.repositories") // Scan all JPA repositories
 @EntityScan(basePackages = "com.devopsbuddy.backend.persistence.domain.backend") // Scan all JPA entities
 @EnableTransactionManagement // This enables annotation based transaction management (JPA transaction is managed by default)
+/** @PropertySource Gets the user credentials from the .properties file in home directory */
+@PropertySource(value = "file:///${user.home}/.devopsbuddy/application-common.properties", ignoreResourceNotFound = true)
 public class ApplicationConfig {
 }

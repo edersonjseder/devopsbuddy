@@ -1,3 +1,4 @@
+/** Function of the about.html page */
 $( document ).ready( main );
 
 function main() {
