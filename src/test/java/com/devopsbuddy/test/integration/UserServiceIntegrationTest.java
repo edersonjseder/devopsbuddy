@@ -25,7 +25,7 @@ import java.util.Set;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DevopsbuddyApplication.class)
-public class UserServiceIntegrationTest {
+public class UserServiceIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private UserService userService;

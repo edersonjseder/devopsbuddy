@@ -29,16 +29,7 @@ import java.util.Set;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DevopsbuddyApplication.class)
-public class RepositoriesIntegrationTest {
-
-    @Autowired
-    private PlanRepository planRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+public class UserIntegrationTest extends AbstractIntegrationTest {
 
     @Rule public TestName testName = new TestName();
 
@@ -104,46 +95,6 @@ public class RepositoriesIntegrationTest {
             Assert.assertNotNull(ur.getRole().getId());
         }
 
-    }
-
-    private User createUser(String username, String email) {
-
-        /** Creates a plan first */
-        Plan basicPlan = createBasicPlan(PlansEnum.BASIC);
-        planRepository.save(basicPlan);
-
-        /** Creates the user and add the plan object as a foreign key */
-        User basicUser = UserUtils.createBasicUser(username, email);
-        basicUser.setPlan(basicPlan);
-
-        /** Creates a role */
-        Role basicRole = createBasicRole(RolesEnum.BASIC);
-        roleRepository.save(basicRole);
-
-        /** Creates a Set collection of roles due to the
-         * one to many relationship between entities */
-        Set<UserRole> userRoles = new HashSet<>();
-
-        /** Creates the object that represent the one to many
-         * relationship between user and role entities and add
-         * both objects on entity as foreign key */
-        UserRole userRole = new UserRole(basicUser, basicRole);
-        userRoles.add(userRole);
-
-        /** Adding the object collection of user roles to user entity
-         * (Always call the get method of Set collection to add objects in JPA)*/
-        basicUser.getUserRoles().addAll(userRoles);
-        basicUser = userRepository.save(basicUser);
-
-        return basicUser;
-    }
-
-    private Plan createBasicPlan(PlansEnum plansEnum) {
-        return new Plan(plansEnum);
-    }
-
-    private Role createBasicRole(RolesEnum rolesEnum) {
-        return new Role(rolesEnum);
     }
 
 }

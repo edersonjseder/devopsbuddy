@@ -24,16 +24,13 @@ public class User implements Serializable, UserDetails {
 
     @Column(unique = true)
     private String username;
+
     private String password;
 
     @Column(unique = true)
     private String email;
+
     private boolean enabled;
-
-    /** Default constructor */
-    public User(){
-
-    }
 
     @Column(name = "first_name")
     private String firstName;
@@ -61,6 +58,14 @@ public class User implements Serializable, UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<UserRole> userRoles = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
+    private Set<PasswordResetToken> passwordResetTokens = new HashSet<>();
+
+    /** Default constructor */
+    public User(){
+
+    }
 
     public int getId() {
         return id;
@@ -187,6 +192,14 @@ public class User implements Serializable, UserDetails {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Set<PasswordResetToken> getPasswordResetTokens() {
+        return passwordResetTokens;
+    }
+
+    public void setPasswordResetTokens(Set<PasswordResetToken> passwordResetTokens) {
+        this.passwordResetTokens = passwordResetTokens;
     }
 
     @Override
