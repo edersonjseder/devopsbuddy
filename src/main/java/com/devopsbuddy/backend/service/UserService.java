@@ -1,5 +1,6 @@
 package com.devopsbuddy.backend.service;
 
+import com.devopsbuddy.backend.persistence.domain.backend.PasswordResetToken;
 import com.devopsbuddy.backend.persistence.domain.backend.Plan;
 import com.devopsbuddy.backend.persistence.domain.backend.User;
 import com.devopsbuddy.backend.persistence.domain.backend.UserRole;
@@ -7,6 +8,8 @@ import com.devopsbuddy.backend.persistence.repositories.PlanRepository;
 import com.devopsbuddy.backend.persistence.repositories.RoleRepository;
 import com.devopsbuddy.backend.persistence.repositories.UserRepository;
 import com.devopsbuddy.enums.PlansEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,9 @@ import java.util.Set;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
+
+    /** The application logger */
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private PlanRepository planRepository;
@@ -64,5 +70,30 @@ public class UserService {
 
         return user;
 
+    }
+
+    /**
+     * Retrieves a user for the given email.
+     * @param email The email to be returned
+     * @return a User given the email passed or null if none is found.
+     */
+    public User findUserByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
+
+    /**
+     * Retrieves a user for the given id.
+     * @param userId The id to be returned
+     * @return a User given the id passed or null if none is found.
+     */
+    public User findUserById(int userId){
+        return userRepository.findOne(userId);
+    }
+
+    @Transactional
+    public void updateUserPassword(int userId, String password) {
+        password = passwordEncoder.encode(password);
+        userRepository.updateUserPassword(userId, password);
+        LOG.debug("Password updated successfully for user id {}", userId);
     }
 }
