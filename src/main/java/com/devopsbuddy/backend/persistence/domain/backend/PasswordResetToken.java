@@ -55,7 +55,8 @@ public class PasswordResetToken implements Serializable {
      *
      */
     public PasswordResetToken(String token, User user, LocalDateTime creationDateTime, int expirationInMinutes) {
-        if ((null == token) || (null == user) || (null == creationDateTime)) {
+
+        if ((token == null) || (null == user) || (null == creationDateTime)) {
             throw new IllegalArgumentException("Token, user and creation date time can't be null");
         }
 

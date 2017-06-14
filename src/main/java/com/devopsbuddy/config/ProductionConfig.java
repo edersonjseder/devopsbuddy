@@ -19,6 +19,7 @@ public class ProductionConfig {
 
     /**
      * Returns The Stmp Email Service instance
+     *
      * @return An instance of the Stmp Email Service class
      */
     @Bean

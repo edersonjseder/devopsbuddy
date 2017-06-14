@@ -41,6 +41,7 @@ public class UserUtils {
 
     /**
      * Builds and returns the URL to reset the user password.
+     *
      * @param request The Http Servlet Request.
      * @param userId The user id.
      * @param token The token
