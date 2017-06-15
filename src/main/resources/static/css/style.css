@@ -65,3 +65,8 @@ body {
     line-height: 1;
     letter-spacing: -1px;
 }
+
+.error {
+    color: red;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
