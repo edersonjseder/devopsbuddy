@@ -2,6 +2,7 @@ package com.devopsbuddy.utils;
 
 import com.devopsbuddy.backend.persistence.domain.backend.User;
 import com.devopsbuddy.web.controllers.ForgotMyPasswordController;
+import com.devopsbuddy.web.domain.frontend.BasicAccountPayload;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -63,5 +64,30 @@ public class UserUtils {
                         token;
 
         return passwordResetUrl;
+    }
+
+    /**
+     * Method that accepts any object that extends the BasicAccountPayload class coming
+     * from the web layer and returns a User entity object filled
+     *
+     * @param frontEndPayload the web layer class parameter got by the frontend
+     * @param <T> the generic class type that extends from BasicAccountPayload
+     * @return the user entity filled with data.
+     */
+    public static <T extends BasicAccountPayload> User fromWebUserToDomainUser(T frontEndPayload) {
+
+        User user = new User();
+
+        user.setUsername(frontEndPayload.getUsername());
+        user.setPassword(frontEndPayload.getPassword());
+        user.setFirstName(frontEndPayload.getFirstName());
+        user.setLastName(frontEndPayload.getLastName());
+        user.setEmail(frontEndPayload.getEmail());
+        user.setPhoneNumber(frontEndPayload.getPhoneNumber());
+        user.setCountry(frontEndPayload.getCountry());
+        user.setEnabled(true);
+        user.setDescription(frontEndPayload.getDescription());
+
+        return user;
     }
 }
