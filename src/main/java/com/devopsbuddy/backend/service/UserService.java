@@ -72,8 +72,18 @@ public class UserService {
     }
 
     /**
+     * Retrieves the user for the given username
+     *
+     * @param username the username parameter to look for the user object
+     * @return a User given the username passed or null if none is found
+     */
+    public User findByUserName(String username){
+        return userRepository.findByUsername(username);
+    }
+
+    /**
      * Retrieves a user for the given email.
-     * @param email The email to be returned
+     * @param email The email to look for the user object
      * @return a User given the email passed or null if none is found.
      */
     public User findUserByEmail(String email){
@@ -82,7 +92,7 @@ public class UserService {
 
     /**
      * Retrieves a user for the given id.
-     * @param userId The id to be returned
+     * @param userId The id to look for the user object
      * @return a User given the id passed or null if none is found.
      */
     public User findUserById(int userId){

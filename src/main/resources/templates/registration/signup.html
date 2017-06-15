@@ -36,7 +36,7 @@
                 <p class="lead" th:text="#{signup.form.title.text}"></p>
 
                 <form id="signupForm" th:action="@{/signup}"
-                      th:object="${__${T(com.devopsbuddy.web.controllers.SignupController).PAYLOAD_MODEL_KEY_NAME}__}"
+                      th:object="${__${T(com.devopsbuddy.web.controllers.SignUpController).PAYLOAD_MODEL_KEY_NAME}__}"
                       method="post" class="text-left" enctype="multipart/form-data">
 
                     <!-- Hidden field for the POST request -->
