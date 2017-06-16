@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Sign Up Controller to control the creation of user information and credentials
+ *
  * Created by root on 15/06/17.
  */
 @Controller
@@ -75,6 +78,19 @@ public class SignUpController {
         return SUBSCRIPTION_VIEW_NAME;
     }
 
+    /**
+     * - Method invoked by Sign Up button on the form HTML page -
+     *
+     * It creates an user based on the information inserted by the use on the HTML page
+     * and saves it in the database
+     *
+     * @param planId The plan id chosen by the user, if it's Basic or Pro
+     * @param file The profile image file uploaded by the user to Amazon S3 Cloud bucket
+     * @param payload The front end pojo in which the user inserted his data
+     * @param model The Spring Model that manipulates data objects in the screen
+     * @return The Subscription view name with the message to the user if was successful or not
+     * @throws IOException The exception if an error occurred while saving the image file on Amazon S3
+     */
     @RequestMapping(value = SIGNUP_URL_MAPPING, method = RequestMethod.POST)
     public String signUpPost(@RequestParam(name = "planId", required = true) int planId,
                              @RequestParam(name = "file", required = false) MultipartFile file,
@@ -95,6 +111,8 @@ public class SignUpController {
         // Variable to set true or false if there is a duplicated username or email
         boolean duplicates = false;
 
+        // List of error messages to be shown to the user on the bootstrap alert on HTML page0
+        // A list is necessary because we check if the username and the email are duplicated
         List<String> errorMessages = new ArrayList<>();
 
         if (model.containsKey(DUPLICATED_USERNAME_KEY)){
@@ -111,6 +129,7 @@ public class SignUpController {
             duplicates = true;
         }
 
+        // Check if the duplicated flag was set to true or is kept in false
         if (duplicates){
 
             model.addAttribute(ERROR_MESSAGE_KEY, errorMessages);
@@ -157,7 +176,22 @@ public class SignUpController {
             registeredUser = userService.createUser(user, PlansEnum.BASIC, userRoles);
 
         } else {
+            // If the user choose Pro plan, it gets the credit card info to process the purchase
             userRoles.add(new UserRole(user, new Role(RolesEnum.PRO)));
+
+            // Extra precaution in case the POST method is invoked programmatically
+            if (StringUtils.isEmpty(payload.getCardCode()) ||
+                    StringUtils.isEmpty(payload.getCardNumber()) ||
+                    StringUtils.isEmpty(payload.getCardMonth()) ||
+                    StringUtils.isEmpty(payload.getCardYear())) {
+
+                LOG.error("One or more credit card fields is null or empty. Returning error to the user.");
+                model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+                model.addAttribute(ERROR_MESSAGE_KEY, "One or more credit card fields is null or empty");
+
+                return SUBSCRIPTION_VIEW_NAME;
+            }
+
             registeredUser = userService.createUser(user, PlansEnum.PRO, userRoles);
             LOG.debug(payload.toString());
         }

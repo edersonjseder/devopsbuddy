@@ -19,7 +19,7 @@ public class UserUtils {
     }
 
     /**
-     * Creates a user with basic attributes set.
+     * Creates a user with basic attributes set for test.
      *
      * @param username The username parameter.
      * @param email The email parameter.
@@ -41,7 +41,7 @@ public class UserUtils {
     }
 
     /**
-     * Builds and returns the URL to reset the user password.
+     * Builds and returns the URL to reset the user password and send by email.
      *
      * @param request The Http Servlet Request.
      * @param userId The user id.

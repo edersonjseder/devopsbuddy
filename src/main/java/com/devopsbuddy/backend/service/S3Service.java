@@ -20,6 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
+ * Service class to connect with the Amazon S3 Cloud
+ *
  * Created by root on 16/06/17.
  */
 @Service

@@ -30,23 +30,42 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource(value = "file:///${user.home}/.devopsbuddy/application-common.properties", ignoreResourceNotFound = true)
 public class ApplicationConfig {
 
+    // Values from the application-common.properties file on user file
     @Value("${aws.s3.profile}")
     private String awsProfile;
 
+    // Values from the application-common.properties file on user file
     @Value("${aws.s3.credentials.access.key}")
     private String accessKey;
 
+    // Values from the application-common.properties file on user file
     @Value("${aws.s3.credentials.secret.key}")
     private String secretKey;
 
+    // Values from the application-common.properties file on user file
     @Value("${aws.s3.region}")
     private String region;
 
+    /**
+     * Bean used by spring to verify if the access key and secret key credentials match with the
+     * Amazon S3 Service user info
+     * @return The Basic Amazon S3 Service permission access its content
+     */
     @Bean
     public BasicAWSCredentials basicAWSCredentials() {
         return new BasicAWSCredentials(accessKey, secretKey);
     }
 
+    /**
+     * - Method invoked by the S3Service class -
+     *
+     * This bean receives the Amazon S3 Cloud credentials and return the Amazon S3 Client object
+     * that gives access permissions based on the access key and access secret key to manipulate
+     * data on its buckets
+     *
+     * @param credentials The Amazon S3 Cloud service credentials for access
+     * @return The Service bean that gives access to the Amazon S3 Cloud Service
+     */
     @Bean
     public AmazonS3Client s3Client(AWSCredentials credentials) {
 

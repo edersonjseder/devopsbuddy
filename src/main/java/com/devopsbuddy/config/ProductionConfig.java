@@ -18,9 +18,9 @@ import org.springframework.context.annotation.PropertySource;
 public class ProductionConfig {
 
     /**
-     * Returns The Stmp Email Service instance
+     * Returns The Smtp Email Service instance
      *
-     * @return An instance of the Stmp Email Service class
+     * @return An instance of the Smtp Email Service class
      */
     @Bean
     public EmailService emailService() {
