@@ -85,11 +85,24 @@
 			<version>1.14.0</version>
 		</dependency>
 
-
 		<!-- Logging dependencies -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+		</dependency>
+
+		<!-- AWS dependencies -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>LATEST</version>
+		</dependency>
+
+		<!-- Commons dependencies -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>LATEST</version>
 		</dependency>
 
 		<!-- Test dependencies -->

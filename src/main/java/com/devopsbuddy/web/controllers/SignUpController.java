@@ -5,6 +5,7 @@ import com.devopsbuddy.backend.persistence.domain.backend.Role;
 import com.devopsbuddy.backend.persistence.domain.backend.User;
 import com.devopsbuddy.backend.persistence.domain.backend.UserRole;
 import com.devopsbuddy.backend.service.PlanService;
+import com.devopsbuddy.backend.service.S3Service;
 import com.devopsbuddy.backend.service.UserService;
 import com.devopsbuddy.enums.PlansEnum;
 import com.devopsbuddy.enums.RolesEnum;
@@ -41,11 +42,17 @@ public class SignUpController {
     /** The application logger */
     private static final Logger LOG = LoggerFactory.getLogger(SignUpController.class);
 
+    // Spring instantiates the object through DI
     @Autowired
     private UserService userService;
 
+    // Spring instantiates the object through DI
     @Autowired
     private PlanService planService;
+
+    // Spring instantiates the object through DI
+    @Autowired
+    private S3Service s3Service;
 
     public static final String DUPLICATED_USERNAME_KEY = "duplicatedUsername";
     public static final String DUPLICATED_EMAIL_KEY = "duplicatedEmail";
@@ -74,6 +81,7 @@ public class SignUpController {
                              @ModelAttribute(PAYLOAD_MODEL_KEY_NAME) @Valid ProAccountPayload payload,
                              ModelMap model) throws IOException {
 
+        // Verifies if the plan exists according to the plan id passed as parameter
         if ((planId != PlansEnum.BASIC.getId()) && (planId != PlansEnum.PRO.getId())){
             model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
             model.addAttribute(ERROR_MESSAGE_KEY, "Plan doesn't exist");
@@ -81,8 +89,10 @@ public class SignUpController {
             return SUBSCRIPTION_VIEW_NAME;
         }
 
+        // Checks if there is already an user object by email or username conditions
         this.checkForDuplicates(payload, model);
 
+        // Variable to set true or false if there is a duplicated username or email
         boolean duplicates = false;
 
         List<String> errorMessages = new ArrayList<>();
@@ -115,7 +125,8 @@ public class SignUpController {
 
         // Stores the profile image on Amazon S3 and stores the URL in the user's record
         if ((file != null) && (!file.isEmpty())){
-            String profileImageUrl = null;
+
+            String profileImageUrl = s3Service.storeProfileImage(file, payload.getUsername());
 
             if (profileImageUrl != null){
                 user.setProfileImageUrl(profileImageUrl);
@@ -151,13 +162,14 @@ public class SignUpController {
             LOG.debug(payload.toString());
         }
 
-        // Auto logins the registered user
+        // Auto logins the registered user after subscribe him
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 registeredUser, null, registeredUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         LOG.info("User created successfully");
 
+        // Set the message key to show the correct bootstrap alert message on the screen
         model.addAttribute(SIGNED_UP_MESSAGE_KEY, "true");
 
         return SUBSCRIPTION_VIEW_NAME;
