@@ -1,8 +1,10 @@
 package com.devopsbuddy.backend.service;
 
+import com.devopsbuddy.backend.persistence.domain.backend.PasswordResetToken;
 import com.devopsbuddy.backend.persistence.domain.backend.Plan;
 import com.devopsbuddy.backend.persistence.domain.backend.User;
 import com.devopsbuddy.backend.persistence.domain.backend.UserRole;
+import com.devopsbuddy.backend.persistence.repositories.PasswordResetTokenRepository;
 import com.devopsbuddy.backend.persistence.repositories.PlanRepository;
 import com.devopsbuddy.backend.persistence.repositories.RoleRepository;
 import com.devopsbuddy.backend.persistence.repositories.UserRepository;
@@ -38,36 +40,47 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
     @Transactional
     public User createUser(User user, PlansEnum plansEnum, Set<UserRole> userRoles) {
 
-        String encryptedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encryptedPassword);
+        User localUser = userRepository.findByEmail(user.getEmail());
 
-        Plan plan = new Plan(plansEnum);
+        if (localUser != null){
+            LOG.info("User with username {} and email {} already exist. Nothing will be done. ", user.getUsername(), user.getEmail());
+        } else {
 
-        // It makes sure plans exist in the database.
-        if (!planRepository.exists(plansEnum.getId())){
-            plan = planRepository.save(plan);
+            String encryptedPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(encryptedPassword);
+
+            Plan plan = new Plan(plansEnum);
+
+            // It makes sure plans exist in the database.
+            if (!planRepository.exists(plansEnum.getId())){
+                plan = planRepository.save(plan);
+            }
+
+            user.setPlan(plan);
+
+            /** Saves the other side of the user to roles
+             * relationship by persisting all roles in
+             * the UserRoles collection */
+            for (UserRole ur : userRoles) {
+
+                roleRepository.save(ur.getRole());
+            }
+
+            /** Adding the object collection of user roles to user entity
+             * (Always call the get method of Set collection to add objects in JPA)*/
+            user.getUserRoles().addAll(userRoles);
+
+            localUser = userRepository.save(user);
+
         }
 
-        user.setPlan(plan);
-
-        /** Saves the other side of the user to roles
-         * relationship by persisting all roles in
-         * the UserRoles collection */
-        for (UserRole ur : userRoles) {
-
-            roleRepository.save(ur.getRole());
-        }
-
-        /** Adding the object collection of user roles to user entity
-         * (Always call the get method of Set collection to add objects in JPA)*/
-        user.getUserRoles().addAll(userRoles);
-
-        user = userRepository.save(user);
-
-        return user;
+        return localUser;
 
     }
 
@@ -104,5 +117,10 @@ public class UserService {
         password = passwordEncoder.encode(password);
         userRepository.updateUserPassword(userId, password);
         LOG.debug("Password updated successfully for user id {}", userId);
+
+        Set<PasswordResetToken> resetTokens = passwordResetTokenRepository.findAllByUserId(userId);
+        if (!resetTokens.isEmpty()){
+            passwordResetTokenRepository.delete(resetTokens);
+        }
     }
 }

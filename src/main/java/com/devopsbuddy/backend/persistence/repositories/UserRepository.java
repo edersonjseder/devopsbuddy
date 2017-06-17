@@ -31,6 +31,7 @@ public interface UserRepository extends CrudRepository<User, Integer> {
      */
     User findByEmail(String email);
 
+    @Transactional
     @Modifying // Indicates to JPA engine that the content of the @Query annotation will change the database state
     @Query("update User user set user.password =:password where user.id =:userId")
     void updateUserPassword(@Param("userId") int userId, @Param("password") String password);

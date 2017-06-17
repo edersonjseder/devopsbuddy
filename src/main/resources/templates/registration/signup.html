@@ -135,13 +135,13 @@
                         </div>
                         <div>
                             <label for="cardMonth" id="cardMonth" th:text="#{signup.form.credit.card.month}"></label>
-                            <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="monthOfYear">
+                            <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="monthOfYear" th:field="*{cardMonth}">
                                 <option th:each="month: ${T(com.devopsbuddy.enums.MonthsEnum).values()}"
-                                        th:value="${#strings.toString(month.getId())}"
+                                        th:value="${month.id}"
                                         th:text="${month.monthOfYear}"></option>
                             </select>
 
-                            <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="cardYear">
+                            <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="cardYear" th:field="*{cardYear}">
                                 <option th:each="year: ${T(com.devopsbuddy.enums.CardYearEnum).values()}"
                                         th:value="${year.cardYear}"
                                         th:text="${year.cardYear}"></option>

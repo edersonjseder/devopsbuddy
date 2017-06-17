@@ -206,7 +206,7 @@ public class SignUpController {
 
             customerParams.put("description", "DevOps Buddy Customer. Username: " + payload.getUsername());
             customerParams.put("email", payload.getEmail());
-            customerParams.put("plan", selectedPlan.getId());
+//            customerParams.put("plan", selectedPlan.getId());
 
             LOG.info("Subscribing the customer to plan {}", selectedPlan.getName());
             String  stripeCustomerId = stripeService.createCustomer(stripeTokenParms, customerParams);
