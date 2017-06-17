@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement // This enables annotation based transaction management (JPA transaction is managed by default)
 /** @PropertySource Gets the webmaster user credentials created from the .properties file in home directory */
 @PropertySource(value = "file:///${user.home}/.devopsbuddy/application-common.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "file:///${user.home}/.devopsbuddy/stripe.properties", ignoreResourceNotFound = true)
 public class ApplicationConfig {
 
     // Values from the application-common.properties file on user file
