@@ -16,40 +16,40 @@ import org.springframework.test.context.junit4.SpringRunner;
 /**
  * Created by root on 11/06/17.
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = DevopsbuddyApplication.class)
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes = DevopsbuddyApplication.class)
 public class PasswordResetTokenServiceIntegrationTest extends AbstractServiceIntegrationTest {
-
-    @Autowired
-    private PasswordResetTokenService passwordResetTokenService;
-
-    @Rule
-    public TestName testName = new TestName();
-
-    @Test
-    public void testCreateNewTokenForUserEmail() throws Exception {
-
-        User user = createUser(testName);
-
-        PasswordResetToken passwordResetToken =
-                passwordResetTokenService.createPasswordResetTokenForEmail(user.getEmail());
-
-        Assert.assertNotNull(passwordResetToken);
-        Assert.assertNotNull(passwordResetToken.getToken());
-    }
-
-    @Test
-    public void testFindByToken() throws Exception {
-
-        User user = createUser(testName);
-
-        PasswordResetToken passwordResetToken =
-                passwordResetTokenService.createPasswordResetTokenForEmail(user.getEmail());
-
-        Assert.assertNotNull(passwordResetToken);
-        Assert.assertNotNull(passwordResetToken.getToken());
-
-        PasswordResetToken token = passwordResetTokenService.findByToken(passwordResetToken.getToken());
-        Assert.assertNotNull(token);
-    }
+//
+//    @Autowired
+//    private PasswordResetTokenService passwordResetTokenService;
+//
+//    @Rule
+//    public TestName testName = new TestName();
+//
+//    @Test
+//    public void testCreateNewTokenForUserEmail() throws Exception {
+//
+//        User user = createUser(testName);
+//
+//        PasswordResetToken passwordResetToken =
+//                passwordResetTokenService.createPasswordResetTokenForEmail(user.getEmail());
+//
+//        Assert.assertNotNull(passwordResetToken);
+//        Assert.assertNotNull(passwordResetToken.getToken());
+//    }
+//
+//    @Test
+//    public void testFindByToken() throws Exception {
+//
+//        User user = createUser(testName);
+//
+//        PasswordResetToken passwordResetToken =
+//                passwordResetTokenService.createPasswordResetTokenForEmail(user.getEmail());
+//
+//        Assert.assertNotNull(passwordResetToken);
+//        Assert.assertNotNull(passwordResetToken.getToken());
+//
+//        PasswordResetToken token = passwordResetTokenService.findByToken(passwordResetToken.getToken());
+//        Assert.assertNotNull(token);
+//    }
 }

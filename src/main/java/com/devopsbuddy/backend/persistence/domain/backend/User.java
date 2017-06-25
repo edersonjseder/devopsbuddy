@@ -41,7 +41,7 @@ public class User implements Serializable, UserDetails {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Length(max = 500)
+    @Length(max = 1000)
     private String description;
 
     private String country;

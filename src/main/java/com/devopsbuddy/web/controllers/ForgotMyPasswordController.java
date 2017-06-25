@@ -5,6 +5,7 @@ import com.devopsbuddy.backend.persistence.domain.backend.User;
 import com.devopsbuddy.backend.service.EmailService;
 import com.devopsbuddy.backend.service.PasswordResetTokenService;
 import com.devopsbuddy.backend.service.UserService;
+import com.devopsbuddy.enums.ForgotMyPasswordEnum;
 import com.devopsbuddy.utils.UserUtils;
 import com.devopsbuddy.backend.service.I18NService;
 import org.slf4j.Logger;
@@ -36,28 +37,12 @@ public class ForgotMyPasswordController {
     /** The application logger */
     private static final Logger LOG = LoggerFactory.getLogger(ForgotMyPasswordController.class);
 
-    /** The email view name */
-    public static final String EMAIL_ADDRESS_VIEW_NAME = "forgotmypassword/emailForm";
-
     public static final String FORGOT_PASSWORD_URL_MAPPING = "/forgotmypassword";
-
-    public static final String MAIL_SENT_KEY = "mailSent";
 
     // Path for Spring framework to map via @RequestMapping to redirect to the change password
     // page in the link sent by email
     public static final String CHANGE_PASSWORD_PATH = "/changeuserpassword";
 
-    public static final String EMAIL_MESSAGE_TEXT_PROPERTY_NAME = "forgotmypassword.email.text";
-
-    // Constant representing the url to be redirected to the specified page
-    public static final String CHANGE_PASSWORD_VIEW_NAME = "forgotmypassword/changePassword";
-
-    // Constant representing the passwordReset object as a condition verification to the th:if value
-    // on the changePassword.html page
-    public static final String PASSWORD_RESET_ATTRIBUTE_NAME = "passwordReset";
-
-    // Message to be shown on changePassword.html page
-    public static final String MESSAGE_ATTRIBUTE_NAME = "message";
 
     @Autowired
     private PasswordResetTokenService passwordResetTokenService;
@@ -76,7 +61,7 @@ public class ForgotMyPasswordController {
 
     @RequestMapping(value = FORGOT_PASSWORD_URL_MAPPING, method = RequestMethod.GET)
     public String forgotPasswordGet() {
-        return EMAIL_ADDRESS_VIEW_NAME;
+        return ForgotMyPasswordEnum.EMAIL_ADDRESS_VIEW_NAME.getPath();
     }
 
     /**
@@ -112,7 +97,7 @@ public class ForgotMyPasswordController {
             LOG.debug("===>> Reset password URL {}", resetPasswordUrl);
 
             // This is the email text to be shown on user's email
-            String emailText = i18NService.getMessage(EMAIL_MESSAGE_TEXT_PROPERTY_NAME, request.getLocale());
+            String emailText = i18NService.getMessage(ForgotMyPasswordEnum.EMAIL_MESSAGE_TEXT_PROPERTY_NAME.getPath(), request.getLocale());
 
             /**
              * Block that sets the mail info and send the link by email to the user
@@ -129,9 +114,9 @@ public class ForgotMyPasswordController {
         }
 
         // The object to be shown on the page indicating that the email was sent successfully
-        model.addAttribute(MAIL_SENT_KEY, "true");
+        model.addAttribute(ForgotMyPasswordEnum.MAIL_SENT_KEY.getPath(), "true");
 
-        return EMAIL_ADDRESS_VIEW_NAME;
+        return ForgotMyPasswordEnum.EMAIL_ADDRESS_VIEW_NAME.getPath();
     }
 
     /**
@@ -154,9 +139,9 @@ public class ForgotMyPasswordController {
          * */
         if (StringUtils.isEmpty(token) || id == 0) {
             LOG.error("Invalid user id {} or token value {}", id, token);
-            model.addAttribute(PASSWORD_RESET_ATTRIBUTE_NAME, "false");
-            model.addAttribute(MESSAGE_ATTRIBUTE_NAME, "Invalid user id or token value");
-            return CHANGE_PASSWORD_VIEW_NAME;
+            model.addAttribute(ForgotMyPasswordEnum.PASSWORD_RESET_ATTRIBUTE_NAME.getPath(), "false");
+            model.addAttribute(ForgotMyPasswordEnum.MESSAGE_ATTRIBUTE_NAME.getPath(), "Invalid user id or token value");
+            return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
         }
 
         // If not then it will use the service to find the object PasswordResetToken by token
@@ -167,9 +152,9 @@ public class ForgotMyPasswordController {
          * */
         if (null == passwordResetToken) {
             LOG.warn("A token couldn't be found with the value {}", token);
-            model.addAttribute(PASSWORD_RESET_ATTRIBUTE_NAME, "false");
-            model.addAttribute(MESSAGE_ATTRIBUTE_NAME, "Token not found.");
-            return CHANGE_PASSWORD_VIEW_NAME;
+            model.addAttribute(ForgotMyPasswordEnum.PASSWORD_RESET_ATTRIBUTE_NAME.getPath(), "false");
+            model.addAttribute(ForgotMyPasswordEnum.MESSAGE_ATTRIBUTE_NAME.getPath(), "Token not found.");
+            return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
 
         }
 
@@ -182,9 +167,9 @@ public class ForgotMyPasswordController {
          * */
         if (user.getId() != id) {
             LOG.error("The user id {} passed as parameter doesn't match the user id {} associated with the token {}", id, user.getId(), token);
-            model.addAttribute(PASSWORD_RESET_ATTRIBUTE_NAME, "false");
-            model.addAttribute(MESSAGE_ATTRIBUTE_NAME, i18NService.getMessage("resetPassword.token.invalid", locale));
-            return CHANGE_PASSWORD_VIEW_NAME;
+            model.addAttribute(ForgotMyPasswordEnum.PASSWORD_RESET_ATTRIBUTE_NAME.getPath(), "false");
+            model.addAttribute(ForgotMyPasswordEnum.MESSAGE_ATTRIBUTE_NAME.getPath(), i18NService.getMessage("resetPassword.token.invalid", locale));
+            return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
 
         }
 
@@ -194,9 +179,9 @@ public class ForgotMyPasswordController {
          * */
         if (LocalDateTime.now(Clock.systemUTC()).isAfter(passwordResetToken.getExpiryDate())) {
             LOG.error("The token {} has expired.", token);
-            model.addAttribute(PASSWORD_RESET_ATTRIBUTE_NAME, "false");
-            model.addAttribute(MESSAGE_ATTRIBUTE_NAME, i18NService.getMessage("resetPassword.token.expired", locale));
-            return CHANGE_PASSWORD_VIEW_NAME;
+            model.addAttribute(ForgotMyPasswordEnum.PASSWORD_RESET_ATTRIBUTE_NAME.getPath(), "false");
+            model.addAttribute(ForgotMyPasswordEnum.MESSAGE_ATTRIBUTE_NAME.getPath(), i18NService.getMessage("resetPassword.token.expired", locale));
+            return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
 
         }
 
@@ -210,7 +195,7 @@ public class ForgotMyPasswordController {
         Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        return CHANGE_PASSWORD_VIEW_NAME;
+        return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
     }
 
     @RequestMapping(value = CHANGE_PASSWORD_PATH, method = RequestMethod.POST)
@@ -223,10 +208,10 @@ public class ForgotMyPasswordController {
 
         if (authentication == null) {
             LOG.error("An unauthenticated user tried to invoke the reset password POST method.");
-            model.addAttribute(PASSWORD_RESET_ATTRIBUTE_NAME, "false");
-            model.addAttribute(MESSAGE_ATTRIBUTE_NAME, "You are not authorized to perform this request.");
+            model.addAttribute(ForgotMyPasswordEnum.PASSWORD_RESET_ATTRIBUTE_NAME.getPath(), "false");
+            model.addAttribute(ForgotMyPasswordEnum.MESSAGE_ATTRIBUTE_NAME.getPath(), "You are not authorized to perform this request.");
 
-            return CHANGE_PASSWORD_VIEW_NAME;
+            return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
 
         }
 
@@ -234,17 +219,17 @@ public class ForgotMyPasswordController {
 
         if (user.getId() != userId){
             LOG.error("Security breach! User {} is trying to make a password reset request on behalf of {}", user.getId(), userId);
-            model.addAttribute(PASSWORD_RESET_ATTRIBUTE_NAME, "false");
-            model.addAttribute(MESSAGE_ATTRIBUTE_NAME, "You are not authorized to perform this request.");
+            model.addAttribute(ForgotMyPasswordEnum.PASSWORD_RESET_ATTRIBUTE_NAME.getPath(), "false");
+            model.addAttribute(ForgotMyPasswordEnum.MESSAGE_ATTRIBUTE_NAME.getPath(), "You are not authorized to perform this request.");
 
-            return CHANGE_PASSWORD_VIEW_NAME;
+            return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
         }
 
         userService.updateUserPassword(userId, password);
         LOG.info("Password successfully updated for user {}", user.getUsername());
 
-        model.addAttribute(PASSWORD_RESET_ATTRIBUTE_NAME, "true");
+        model.addAttribute(ForgotMyPasswordEnum.PASSWORD_RESET_ATTRIBUTE_NAME.getPath(), "true");
 
-        return CHANGE_PASSWORD_VIEW_NAME;
+        return ForgotMyPasswordEnum.CHANGE_PASSWORD_VIEW_NAME.getPath();
     }
 }

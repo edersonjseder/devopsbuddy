@@ -10,6 +10,7 @@ import com.devopsbuddy.backend.service.StripeService;
 import com.devopsbuddy.backend.service.UserService;
 import com.devopsbuddy.enums.PlansEnum;
 import com.devopsbuddy.enums.RolesEnum;
+import com.devopsbuddy.enums.SignUpEnum;
 import com.devopsbuddy.exceptions.S3Exception;
 import com.devopsbuddy.exceptions.StripeException;
 import com.devopsbuddy.utils.StripeUtils;
@@ -64,14 +65,8 @@ public class SignUpController {
     @Autowired
     private StripeService stripeService;
 
-    public static final String DUPLICATED_USERNAME_KEY = "duplicatedUsername";
-    public static final String DUPLICATED_EMAIL_KEY = "duplicatedEmail";
-    public static final String SIGNED_UP_MESSAGE_KEY = "signedUp";
-    public static final String ERROR_MESSAGE_KEY = "message";
-
     public static final String SIGNUP_URL_MAPPING = "/signup";
     public static final String PAYLOAD_MODEL_KEY_NAME = "payload";
-    public static final String SUBSCRIPTION_VIEW_NAME = "registration/signup";
 
     @RequestMapping(value = SIGNUP_URL_MAPPING, method = RequestMethod.GET)
     public String signUpGet(@RequestParam("planId") int planId, ModelMap model) {
@@ -80,9 +75,9 @@ public class SignUpController {
             throw new IllegalArgumentException("Plan is not valid");
         }
 
-        model.addAttribute(PAYLOAD_MODEL_KEY_NAME, new ProAccountPayload());
+        model.addAttribute(SignUpEnum.PAYLOAD_MODEL_KEY_NAME.getValue(), new ProAccountPayload());
 
-        return SUBSCRIPTION_VIEW_NAME;
+        return SignUpEnum.SUBSCRIPTION_VIEW_NAME.getValue();
     }
 
     /**
@@ -106,10 +101,10 @@ public class SignUpController {
 
         // Verifies if the plan exists according to the plan id passed as parameter
         if ((planId != PlansEnum.BASIC.getId()) && (planId != PlansEnum.PRO.getId())){
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-            model.addAttribute(ERROR_MESSAGE_KEY, "Plan doesn't exist");
+            model.addAttribute(SignUpEnum.SIGNED_UP_MESSAGE_KEY.getValue(), "false");
+            model.addAttribute(SignUpEnum.ERROR_MESSAGE_KEY.getValue(), "Plan doesn't exist");
 
-            return SUBSCRIPTION_VIEW_NAME;
+            return SignUpEnum.SUBSCRIPTION_VIEW_NAME.getValue();
         }
 
         // Checks if there is already an user object by email or username conditions
@@ -122,16 +117,16 @@ public class SignUpController {
         // A list is necessary because we check if the username and the email are duplicated
         List<String> errorMessages = new ArrayList<>();
 
-        if (model.containsKey(DUPLICATED_USERNAME_KEY)){
+        if (model.containsKey(SignUpEnum.DUPLICATED_USERNAME_KEY.getValue())){
             LOG.warn("The username already exists. Displaying error to the user");
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+            model.addAttribute(SignUpEnum.SIGNED_UP_MESSAGE_KEY.getValue(), "false");
             errorMessages.add("Username already exists");
             duplicates = true;
         }
 
-        if (model.containsKey(DUPLICATED_EMAIL_KEY)){
+        if (model.containsKey(SignUpEnum.DUPLICATED_EMAIL_KEY.getValue())){
             LOG.warn("The email already exists. Displaying error to the user");
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+            model.addAttribute(SignUpEnum.SIGNED_UP_MESSAGE_KEY.getValue(), "false");
             errorMessages.add("Email already exists");
             duplicates = true;
         }
@@ -139,9 +134,9 @@ public class SignUpController {
         // Check if the duplicated flag was set to true or is kept in false
         if (duplicates){
 
-            model.addAttribute(ERROR_MESSAGE_KEY, errorMessages);
+            model.addAttribute(SignUpEnum.ERROR_MESSAGE_KEY.getValue(), errorMessages);
 
-            return SUBSCRIPTION_VIEW_NAME;
+            return SignUpEnum.SUBSCRIPTION_VIEW_NAME.getValue();
         }
 
         // There are certain info that the user doesn't set, such as profile image URL, Stripe
@@ -167,10 +162,10 @@ public class SignUpController {
         Plan selectedPlan = planService.findPlanById(planId);
         if (selectedPlan == null){
             LOG.error("The plan id {} could not be found. Throwing exception.", planId);
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-            model.addAttribute(ERROR_MESSAGE_KEY, "Plan id not found");
+            model.addAttribute(SignUpEnum.SIGNED_UP_MESSAGE_KEY.getValue(), "false");
+            model.addAttribute(SignUpEnum.ERROR_MESSAGE_KEY.getValue(), "Plan id not found");
 
-            return SUBSCRIPTION_VIEW_NAME;
+            return SignUpEnum.SUBSCRIPTION_VIEW_NAME.getValue();
         }
         user.setPlan(selectedPlan);
 
@@ -193,10 +188,10 @@ public class SignUpController {
                     StringUtils.isEmpty(payload.getCardYear())) {
 
                 LOG.error("One or more credit card fields is null or empty. Returning error to the user.");
-                model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-                model.addAttribute(ERROR_MESSAGE_KEY, "One or more credit card fields is null or empty");
+                model.addAttribute(SignUpEnum.SIGNED_UP_MESSAGE_KEY.getValue(), "false");
+                model.addAttribute(SignUpEnum.ERROR_MESSAGE_KEY.getValue(), "One or more credit card fields is null or empty");
 
-                return SUBSCRIPTION_VIEW_NAME;
+                return SignUpEnum.SUBSCRIPTION_VIEW_NAME.getValue();
             }
 
             // If the user has selected Pro Account, creates the Stripe customer to store
@@ -226,26 +221,31 @@ public class SignUpController {
         LOG.info("User created successfully");
 
         // Set the message key to show the correct bootstrap alert message on the screen
-        model.addAttribute(SIGNED_UP_MESSAGE_KEY, "true");
+        model.addAttribute(SignUpEnum.SIGNED_UP_MESSAGE_KEY.getValue(), "true");
 
-        return SUBSCRIPTION_VIEW_NAME;
+        return SignUpEnum.SUBSCRIPTION_VIEW_NAME.getValue();
 
     }
 
     /**
+     * - Invoked by signUpPost method -
+     *
      * Checks if the username/email are duplicates and sets error flags in the model.
      * Side effect: the method might set attributes on model
+     *
      * @param payload
      * @param model
      */
     private void checkForDuplicates(BasicAccountPayload payload, ModelMap model) {
         // Username
         if (userService.findByUserName(payload.getUsername()) != null){
-            model.addAttribute(DUPLICATED_USERNAME_KEY, "true");
+            // Add the 'true' value to the attribute of the model
+            model.addAttribute(SignUpEnum.DUPLICATED_USERNAME_KEY.getValue(), "true");
         }
 
         if (userService.findUserByEmail(payload.getEmail()) != null){
-            model.addAttribute(DUPLICATED_EMAIL_KEY, "true");
+            // Add the 'true' value to the attribute of the model
+            model.addAttribute(SignUpEnum.DUPLICATED_EMAIL_KEY.getValue(), "true");
         }
     }
 
@@ -268,7 +268,7 @@ public class SignUpController {
         mav.addObject("exception", exception);
         mav.addObject("url", request.getRequestURL());
         mav.addObject("timestamp", LocalDate.now(Clock.systemUTC()));
-        mav.setViewName(GENERIC_ERROR_VIEW_NAME);
+        mav.setViewName(SignUpEnum.GENERIC_ERROR_VIEW_NAME.getValue());
 
         return mav;
     }

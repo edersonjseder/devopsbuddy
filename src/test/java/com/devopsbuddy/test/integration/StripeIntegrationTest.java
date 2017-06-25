@@ -60,7 +60,7 @@ public class StripeIntegrationTest {
 
         Map<String, Object> customerParams = new HashMap<>();
         customerParams.put("description", "Customer for test@example.com");
-        customerParams.put("plan", PlansEnum.BASIC.getId());
+//        customerParams.put("plan", PlansEnum.BASIC.getId());
 
         String stripeCustomerId = stripeService.createCustomer(tokenParams, customerParams);
         assertThat(stripeCustomerId, is(notNullValue()));
