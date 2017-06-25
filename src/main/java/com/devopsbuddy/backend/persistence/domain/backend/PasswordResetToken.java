@@ -114,6 +114,6 @@ public class PasswordResetToken implements Serializable {
 
     @Override
     public int hashCode() {
-        return id;
+        return (int) (id ^ (id >>> 32));
     }
 }

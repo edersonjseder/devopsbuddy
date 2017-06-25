@@ -1,6 +1,7 @@
 package com.devopsbuddy.web.controllers;
 
 import com.devopsbuddy.backend.service.EmailService;
+import com.devopsbuddy.enums.ContactEnum;
 import com.devopsbuddy.web.domain.frontend.FeedBackPojo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,6 @@ public class ContactController {
     /** The key which identifies the feedback payload in the model. */
     public static final String FEEDBACK_MODEL_KEY = "feedback";
 
-    /** The Contact Us view name */
-    private static final String CONTACT_US_VIEW_NAME = "contact/contact";
-
     @Autowired
     private EmailService emailService;
 
@@ -33,15 +31,15 @@ public class ContactController {
     public String contactGet(ModelMap model){
 
         FeedBackPojo feedBackPojo = new FeedBackPojo();
-        model.addAttribute(ContactController.FEEDBACK_MODEL_KEY, feedBackPojo);
+        model.addAttribute(ContactEnum.FEEDBACK_MODEL_KEY.getValue(), feedBackPojo);
 
-        return ContactController.CONTACT_US_VIEW_NAME;
+        return ContactEnum.CONTACT_US_VIEW_NAME.getValue();
     }
 
     @RequestMapping(value = "/contact", method = RequestMethod.POST)
     public String contactPost(@ModelAttribute(FEEDBACK_MODEL_KEY) FeedBackPojo feedback){
         LOG.debug("Feedback POJO content: {}", feedback);
         emailService.sendFeedbackEmail(feedback);
-        return ContactController.CONTACT_US_VIEW_NAME;
+        return ContactEnum.CONTACT_US_VIEW_NAME.getValue();
     }
 }
