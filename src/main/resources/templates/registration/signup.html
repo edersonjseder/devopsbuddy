@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/header :: common-header" />
+
+<body>
+
+<div th:replace="common/navbar :: common-navbar" />
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-md-6 col-md-offset-3">
+
+            <div th:if="${signedUp != null}">
+                <div th:if="${signedUp == 'true'}" class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                    <p th:text="#{signup.profile.created.success}" />
+                </div>
+
+                <div th:if="${signedUp == 'false'}" class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                    <p th:text="${message}" class="text-center" />
+                </div>
+            </div>
+
+            <div class="well">
+
+                <h1 th:if="${#httpServletRequest.getParameter('planId') == '1'}" th:text="#{signup.h1.basic.profile}"></h1>
+                <h1 th:if="${#httpServletRequest.getParameter('planId') == '2'}" th:text="#{signup.h1.pro.profile}"></h1>
+                <p class="lead" th:text="#{signup.form.title.text}"></p>
+
+                <form id="signupForm" th:action="@{/signup}"
+                      th:object="${__${T(com.devopsbuddy.web.controllers.SignUpController).PAYLOAD_MODEL_KEY_NAME}__}"
+                      method="post" class="text-left" enctype="multipart/form-data">
+
+                    <!-- Hidden field for the POST request -->
+                    <div th:if="${param.containsKey('planId')}">
+                        <input type="hidden" name="planId" th:value="${#httpServletRequest.getParameter('planId')}" />
+                    </div>
+
+                    <div class="form-group">
+                        <div th:if="${duplicatedUsername}">
+                            <label for="username" th:text="#{signup.form.error.username.already.exists}"></label>
+                            <input type="text" id="username" th:field="*{username}" class="form-control fieldError" />
+                        </div>
+
+                        <div th:if="${duplicatedUsername == null}">
+                            <label for="username" th:text="#{signup.form.username}"></label>
+                            <input type="text" id="username" th:field="*{username}" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group has-error has-feedback">
+                        <div th:if="${duplicatedEmail}">
+                            <label class="control-label" for="email" th:text="#{signup.form.error.email.already.exists}"></label>
+                            <div class="input-group">
+                                <div class="input-group-addon">@</div>
+                                <input type="text" id="email" th:field="*{email}" class="form-control fieldError" />
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                                <span id="inputError2Status" class="sr-only">(error)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div th:if="${duplicatedEmail == null}">
+                            <label class="control-label" for="email" th:text="#{signup.form.email}"></label>
+                            <div class="input-group">
+                                <div class="input-group-addon">@</div>
+                                <input type="text" id="email" th:field="*{email}" class="form-control" aria-describedby="inputGroupSuccess1Status" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" th:text="#{signup.form.password}"></label>
+                        <input type="password" id="password" th:field="*{password}" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" th:text="#{signup.form.confirm.password}"></label>
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="firstName" th:text="#{signup.form.firstName}"></label>
+                        <input type="text" id="firstName" th:field="*{firstName}" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName" th:text="#{signup.form.lastName}"></label>
+                        <input type="text" id="lastName" th:field="*{lastName}" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" th:text="#{signup.form.description}"></label>
+                        <textarea id="description" th:field="*{description}" class="form-control" rows="4" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="file" th:text="#{signup.form.profile.image.url}"></label>
+                        <input type="file" id="file" name="file" class="form-control-file" aria-describedby="fileHelp" />
+                        <small id="fileHelp" class="form-text text-muted"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country" th:text="#{signup.form.country}"></label>
+                        <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="country" name="country" th:field="*{country}">
+                            <option th:each="country: ${T(com.devopsbuddy.enums.CountriesEnum).values()}"
+                                    th:value="${country.code}"
+                                    th:text="${country.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNumber" th:text="#{signup.form.phoneNumber}"></label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" th:field="*{phoneNumber}" class="form-control" />
+                    </div>
+
+                    <!-- Additional HTML form fields for Pro Account subscription -->
+                    <div th:if="${#httpServletRequest.getParameter('planId') == #strings.toString(T(com.devopsbuddy.enums.PlansEnum).PRO.getId())}">
+                        <div class="form-group">
+                            <label for="cardNumber" th:text="#{signup.form.credit.card.number}"></label>
+                            <input type="text" id="cardNumber" th:field="*{cardNumber}" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="cardCode" id="cardCode" th:text="#{signup.form.credit.card.code}"></label>
+                            <input type="text" th:field="*{cardCode}" class="form-control" />
+                        </div>
+                        <div>
+                            <label for="cardMonth" id="cardMonth" th:text="#{signup.form.credit.card.month}"></label>
+                            <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="monthOfYear" th:field="*{cardMonth}">
+                                <option th:each="month: ${T(com.devopsbuddy.enums.MonthsEnum).values()}"
+                                        th:value="${month.id}"
+                                        th:text="${month.monthOfYear}"></option>
+                            </select>
+
+                            <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="cardYear" th:field="*{cardYear}">
+                                <option th:each="year: ${T(com.devopsbuddy.enums.CardYearEnum).values()}"
+                                        th:value="${year.cardYear}"
+                                        th:text="${year.cardYear}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" th:text="#{form.submit}" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="common/header :: before-body-scripts"/>
+
+</body>
+</html>
